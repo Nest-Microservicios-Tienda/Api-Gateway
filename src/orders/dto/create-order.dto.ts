@@ -5,8 +5,7 @@ import {
   IsOptional,
   IsPositive,
 } from 'class-validator';
-import { OrderStatusList } from '../../../../orders-ms/src/enums/order-enum';
-import { OrderStatus } from '../enums/order-enum';
+import { OrderStatus, OrderStatusList } from '../enums/order-enum';
 
 export class CreateOrderDto {
   @IsNumber()
@@ -25,5 +24,5 @@ export class CreateOrderDto {
 
   @IsOptional()
   @IsBoolean()
-  paid: boolean = false;
+  pay: boolean = false;
 }
