@@ -17,30 +17,22 @@ import { catchError } from 'rxjs';
 
 @Controller('products')
 export class ProductsController {
-  constructor(
-    @Inject('PRODUCT_SERVICE') private readonly ProductsClient: ClientProxy,
-  ) {}
+  constructor(@Inject('NATS_SERVICE') private readonly client: ClientProxy) {}
 
   @Post()
   createProduct(@Body() createProductDTO: CreateProductDto) {
-    return this.ProductsClient.send(
-      { cmd: 'create_Product' },
-      createProductDTO,
-    );
+    return this.client.send({ cmd: 'create_Product' }, createProductDTO);
   }
 
   @Get()
   findAllProduct(@Query() paginationDto: PaginationDto) {
-    return this.ProductsClient.send({ cmd: 'findall_Product' }, paginationDto);
+    return this.client.send({ cmd: 'findall_Product' }, paginationDto);
   }
 
   @Get(':id')
   findProductsById(@Param('id') id: string) {
     try {
-      const product = this.ProductsClient.send(
-        { cmd: 'findById_Product' },
-        { id },
-      );
+      const product = this.client.send({ cmd: 'findById_Product' }, { id });
       return product;
     } catch (error) {
       throw new RpcException(error);
@@ -49,7 +41,7 @@ export class ProductsController {
 
   @Delete(':id')
   deleteProduct(@Param('id') id: string) {
-    return this.ProductsClient.send({ cmd: 'delete_Product' }, { id });
+    return this.client.send({ cmd: 'delete_Product' }, { id });
   }
 
   @Patch(':id')
@@ -57,16 +49,18 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() updateBodyDTO: UpdateProductDto,
   ) {
-    return this.ProductsClient.send(
-      { cmd: 'update_Product' },
-      {
-        id,
-        ...updateBodyDTO,
-      },
-    ).pipe(
-      catchError((err) => {
-        throw new RpcException(err);
-      }),
-    );
+    return this.client
+      .send(
+        { cmd: 'update_Product' },
+        {
+          id,
+          ...updateBodyDTO,
+        },
+      )
+      .pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      );
   }
 }
